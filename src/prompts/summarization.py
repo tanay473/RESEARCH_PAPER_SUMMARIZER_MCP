@@ -9,7 +9,7 @@ def summarize_paper(paper_text: str, context: str, template_key: Optional[str] =
     """Generate a summarization prompt after selecting or sampling templates based on context."""
     if template_key is None:
         template_key = select_prompt_template(context)
-    samples = sample_alternative_templates(paper_text, template_key, context)
+    samples = sample_alternative_templates(paper_text, template_key, context) #type:ignore
     if "warning" in samples:
         return "\n\n".join([f"Sample for {k}: {v}" for k, v in samples.items() if k != "warning"]) + f"\n\n{samples['warning']}"
     instruction = get_prompt_instruction(template_key, prompt_templates)

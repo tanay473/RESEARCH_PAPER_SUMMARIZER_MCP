@@ -1,6 +1,8 @@
 from typing import Dict
 from src.prompts.templates import prompt_templates
+from src.server.mcp_server import mcp
 
+@mcp.tool()
 def select_prompt_template(context: str) -> str:
     ctx = context.lower()
     if any(k in ctx for k in ["statistic", "probabil", "data analysis"]):
