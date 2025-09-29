@@ -4,7 +4,7 @@ from typing import List, Dict
 from src.utils.helpers import safe_get_href
 from src.server.mcp_server import mcp
 
-@mcp.tool()
+@mcp.tool(name="whitePaper_search")
 def fetch_white_papers(company: str, keywords: str, max_results: int = 3) -> List[Dict[str, str]]:
     company_urls = {
         "deepmind": "https://deepmind.google/research/publications/",
