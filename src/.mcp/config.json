@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "arxiv-research-server": {
+      "command": "python",
+      "args": [
+        "/path/to/the/file(absolutepath)"
+      ],
+      "env": {
+        "PYTHONUNBUFFERED": "1"
+      }
+    }
+  }
+}
