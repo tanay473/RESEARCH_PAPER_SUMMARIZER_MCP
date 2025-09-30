@@ -10,7 +10,7 @@ def fetch_white_papers(company: str, keywords: str, max_results: int = 3) -> Lis
         "deepmind": "https://deepmind.google/research/publications/",
         "meta": "https://research.facebook.com/publications/",
         "nvidia": "https://www.amax.com/nvidia-technical-whitepapers/",
-        "openai": "https://openai.com/research/",
+        "openai": "https://openai.com/research/index/publication/",
         "ibm": "https://community.ibm.com/community/user/blogs/armand-ruiz-gabernet/2024/06/24/ibm-granite-large-language-models-whitepaper"
     }
     url = company_urls.get(company.lower())
