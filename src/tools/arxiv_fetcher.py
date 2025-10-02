@@ -55,7 +55,3 @@ def extract_pdf_summary(pdf_url: str, max_pages: int = 2, max_chars: int = 10000
     except Exception as e:
         return f"Error extracting PDF summary: {str(e)}"
 
-# Example usage
-papers = fetch_arxiv_papers("Why language models hallucinate", max_results=10)
-print(papers)
-
