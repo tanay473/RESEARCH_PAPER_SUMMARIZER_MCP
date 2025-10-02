@@ -53,9 +53,10 @@ for further setup refer the setup.md in the repo and setup the server
 ## limitations
 cannot get the papers from the specific companies if they are not avaliable on arxiv 
 ## Note
-This was just a demo to test the MCP for reducing the burden of manual prompting to summarize the research paper 
+-**1**This was just a demo to test the MCP for reducing the burden of manual prompting to summarize the research paper 
 so with this it generates the dynamic templates covering the different aspects of research paper for better summary (kind of Automation for my daily usage)
 So give it a try ....
+-**2** This specific server is configured to AI related Domain Research Papers If you want the summarize specific to any domain just update the prompt section in the directory according to the Domain you want 
 
 ## Contributing
 Fork it, make changes, and send a pull request. Open issues for bugs or ideas.
