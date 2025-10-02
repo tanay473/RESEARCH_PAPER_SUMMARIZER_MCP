@@ -4,9 +4,12 @@ import os
 from dotenv import load_dotenv
 import json
 from src.server.mcp_server import mcp
-from src.prompts.fallback import FALL_BACK_TEMPLATE
-from src.prompts.templates import TEMPLATE_GENERATION_PROMPT
+from src.prompts.templates import (
+    get_template_generation_prompt,
+    get_executive_summary_prompt
+)
 from typing import Any
+from src.prompts.fallback import get_fallback_templates
 
 # Load environment variables
 load_dotenv()
@@ -28,7 +31,7 @@ def generate_dynamic_templates(paper_text: str) -> Dict[str, str]:
     
     try:
         # Generate templates using Gemini
-        prompt = TEMPLATE_GENERATION_PROMPT.format(text=paper_text[:7000])  # Use more context
+        prompt = get_template_generation_prompt(paper_text[:6000])
         response = model.generate_content(prompt)
         
         # Parse the JSON response
@@ -59,13 +62,6 @@ def generate_dynamic_templates(paper_text: str) -> Dict[str, str]:
     except Exception as e:
         print(f"Error generating dynamic templates: {e}")
         return get_fallback_templates()
-
-
-def get_fallback_templates() -> Dict[str, str]:
-    """
-    Fallback templates in case dynamic generation fails.
-    """
-    return FALL_BACK_TEMPLATE
 
 
 def analyze_with_templates(paper_text: str, templates: Dict[str, str]) -> Dict[str, str]:
@@ -115,11 +111,7 @@ def generate_comprehensive_analysis(paper_text: str) -> Dict[str, Any]:
     
     # Generate a brief summary
     model = genai.GenerativeModel('gemini-2.0-flash-exp')
-    summary_prompt = f"""
-    Based on these analyses of a research paper, provide a brief executive summary (3-4 sentences):
-    
-    {json.dumps(analyses, indent=2)}
-    """
+    summary_prompt = get_executive_summary_prompt(json.dumps(analyses, indent=2))
     
     try:
         summary_response = model.generate_content(summary_prompt)

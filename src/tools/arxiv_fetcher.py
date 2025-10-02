@@ -10,6 +10,11 @@ import os
 from dotenv import load_dotenv
 from src.server.mcp_server import mcp
 from src.tools.template_selector import generate_dynamic_templates, analyze_with_templates
+from src.prompts.templates import (
+    get_template_selection_prompt,
+    get_focused_summary_prompt,
+    get_holistic_summary_prompt
+)
 import json
 
 
@@ -62,29 +67,15 @@ def select_best_template_and_generate_summary(
         Dictionary containing:
         - selected_template: The name of the chosen template
         - selection_reasoning: Why this template was chosen
-        - comprehensive_summary: Final summary using the selected template
-        - all_aspects_summary: A holistic summary covering all templates
+        - focused_summary: Final summary using the selected template
+        - holistic_summary: A holistic summary covering all templates
     """
     model = genai.GenerativeModel('gemini-2.0-flash-exp')
     
     # Step 1: Select the best template
-    template_selection_prompt = f"""
-    You are analyzing a research paper. You have generated multiple analysis templates and their corresponding analyses.
-    
-    Available templates and their analyses:
-    {json.dumps(analyses, indent=2)}
-    
-    Your task:
-    1. Review all the analyses above
-    2. Determine which template/aspect provides the MOST valuable insights for understanding this paper
-    3. Explain why this aspect is most critical
-    
-    Respond in JSON format:
-    {{
-      "selected_template": "template_name",
-      "reasoning": "Explanation of why this template is most valuable for this specific paper"
-    }}
-    """
+    template_selection_prompt = get_template_selection_prompt(
+        json.dumps(analyses, indent=2)
+    )
     
     try:
         selection_response = model.generate_content(template_selection_prompt)
@@ -108,24 +99,11 @@ def select_best_template_and_generate_summary(
         selection_reasoning = "Default template selected due to selection error"
     
     # Step 2: Generate comprehensive summary based on selected template
-    primary_summary_prompt = f"""
-    You are summarizing a research paper with focus on: {selected_template}
-    
-    Paper text:
-    {paper_text[:6000]}
-    
-    Analysis from the selected perspective:
-    {analyses.get(selected_template, "No analysis available")}
-    
-    Generate a comprehensive, well-structured summary that:
-    1. Clearly explains the main contribution
-    2. Focuses on the {selected_template.replace('_', ' ')} aspects
-    3. Uses clear, technical language
-    4. Provides specific details and insights
-    5. Is suitable for researchers in this field
-    
-    Length: 300-500 words
-    """
+    primary_summary_prompt = get_focused_summary_prompt(
+        selected_template,
+        paper_text,
+        analyses.get(selected_template, "No analysis available")
+    )
     
     try:
         summary_response = model.generate_content(primary_summary_prompt)
@@ -134,23 +112,9 @@ def select_best_template_and_generate_summary(
         comprehensive_summary = f"Error generating primary summary: {str(e)}"
     
     # Step 3: Generate holistic summary covering all aspects
-    holistic_summary_prompt = f"""
-    You are creating a holistic summary of a research paper by synthesizing multiple analytical perspectives.
-    
-    All analyses:
-    {json.dumps(analyses, indent=2)}
-    
-    Create a comprehensive summary that:
-    1. **Overview**: What is this paper about? (2-3 sentences)
-    2. **Architecture & Design**: Key architectural innovations and why they evolved
-    3. **Mathematical Foundations**: How the math/statistics enable functionality
-    4. **Key Advantages**: Main benefits and performance improvements
-    5. **Limitations & Trade-offs**: Important constraints or costs
-    6. **Future Directions**: Promising research opportunities
-    
-    Structure your response with clear sections. Be specific and technical.
-    Length: 400-600 words
-    """
+    holistic_summary_prompt = get_holistic_summary_prompt(
+        json.dumps(analyses, indent=2)
+    )
     
     try:
         holistic_response = model.generate_content(holistic_summary_prompt)
